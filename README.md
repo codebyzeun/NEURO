@@ -31,8 +31,8 @@ Before you get started, you’ll need to set up a few things:
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/codebyzeun/entityai.git
-   cd entityai
+   git clone https://github.com/codebyzeun/NEURO.git
+   cd NEURO
    ```
 
 2. Install required dependencies:
