@@ -4,11 +4,11 @@ const path = require('path');
 
 class GameBot {
     constructor(options = {}) {
-        this.mode = options.mode || 'robotjs'; // 'robotjs' or 'pyautogui'
+        this.mode = options.mode || 'robotjs'; //robotjs or pyautogui
         this.pyScript = options.pyScript || path.resolve(__dirname, '../../scripts/game_control.py');
     }
 
-    // Simulate a key press
+    //Simulating a key press
     pressKey(key, duration = 100) {
         if (this.mode === 'robotjs') {
             robot.keyToggle(key, 'down');
@@ -20,7 +20,7 @@ class GameBot {
         }
     }
 
-    // Simulate mouse movement to (x, y)
+    //Simulating mouse movement to (x, y)
     moveMouse(x, y) {
         if (this.mode === 'robotjs') {
             robot.moveMouse(x, y);
@@ -31,7 +31,7 @@ class GameBot {
         }
     }
 
-    // Simulate mouse click
+    //Simulate mouse click
     click(button = 'left') {
         if (this.mode === 'robotjs') {
             robot.mouseClick(button);
@@ -42,7 +42,7 @@ class GameBot {
         }
     }
 
-    // Type a string of text
+    //String of text
     typeString(text) {
         if (this.mode === 'robotjs') {
             robot.typeString(text);
@@ -53,7 +53,7 @@ class GameBot {
         }
     }
 
-    // Send a custom action to the Python bridge
+    //Sending a custom action to the Python bridge
     _sendToPython(command) {
         const proc = spawn('python', [this.pyScript, JSON.stringify(command)]);
         proc.on('error', (err) => {
