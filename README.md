@@ -1,6 +1,6 @@
-# EntityAI - VTuber AI Engine
+# NEURO - VTuber AI Engine
 
-EntityAI is a custom AI-powered VTuber system that integrates speech-to-text (STT), text-to-speech (TTS), and interaction with platforms like Discord and OBS. It's powered by Mistral 7B, running locally with Llama.cpp and using custom node.js scripts for various features like game control, voice interaction, and more.
+NEURO is a custom AI-powered VTuber system that integrates speech-to-text (STT), text-to-speech (TTS), and interaction with platforms like Discord and OBS. It's powered by Mistral 7B, running locally with Llama.cpp and using custom node.js scripts for various features like game control, voice interaction, and more.
 
 ## Getting Started
 
