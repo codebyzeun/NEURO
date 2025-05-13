@@ -41,7 +41,7 @@ class ModelRunner {
         let errorOutput = '';
 
         this.llamaProcess.stderr.on('data', (data) => {
-            console.log('Model loading:', data); // Add debug output
+            console.log('Model loading:', data);
             if (data.includes('llama_model_load: loading') || data.includes('build: 5353')) {
                 modelLoaded = true;
             }
