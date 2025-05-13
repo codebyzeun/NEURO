@@ -13,102 +13,120 @@ class ModelRunner {
         this.llamaProcess = null;
     }
     async loadModel() {
-    if (this.llamaProcess) {
-        this.llamaProcess.kill();
+        if (this.llamaProcess) {
+            this.llamaProcess.kill();
+        }
+        const llamaExe = process.env.LLAMA_CPP_PATH || 'llama-cli.exe';
+        
+        this.llamaProcess = spawn(llamaExe, [
+            '-m', this.modelPath,
+            '-c', '2048',
+            '-t', '8',  
+            '-ngl', '1', 
+            '--temp', this.temperature.toString(),
+            '--repeat-penalty', this.repetition_penalty.toString(),
+            '-n', '512',
+            '--top-p', this.top_p.toString(),
+            '-i', 
+            '--prompt', 'Hello\nAssistant: Hi! I am ready to help.\n'
+        ], {
+            shell: false,
+            cwd: process.cwd()
+        });
+
+        this.llamaProcess.stdout.setEncoding('utf8');
+        this.llamaProcess.stderr.setEncoding('utf8');
+
+        // Add error handler
+        this.llamaProcess.on('error', (err) => {
+            console.error('Model process error:', err);
+        });
+
+        return new Promise((resolve, reject) => {
+            let modelLoaded = false;
+            let errorOutput = '';
+
+            this.llamaProcess.stderr.on('data', (data) => {
+                console.log('Model loading:', data);
+                if (data.includes('llama_model_load: loading') || 
+                    data.includes('build: ') || 
+                    data.includes('prepared')) {
+                    modelLoaded = true;
+                }
+                errorOutput += data;
+            });
+            this.llamaProcess.stderr.once('data', () => {
+                if (modelLoaded) {
+                    resolve();
+                }
+            });
+            setTimeout(() => {
+                if (!modelLoaded) {
+                    this.llamaProcess.kill();
+                    reject(new Error('Model loading timed out'));
+                }
+            }, 30000);
+        });
     }
-    const llamaExe = `"${process.env.LLAMA_CPP_PATH || 'llama-cli.exe'}"`;
-    const modelPath = `"${this.modelPath}"`;
-    
-    this.llamaProcess = spawn(llamaExe, [
-        '-m', modelPath,
-        '-c', '32768',
-        '-t', '4',
-        '-ngl', '1',
-        '--temp', this.temperature.toString(),
-        '--repeat-penalty', this.repetition_penalty.toString(),
-        '-n', '128',
-        '--top-p', this.top_p.toString(),
-        '-i'
-    ], {
-        shell: true,
-        cwd: process.cwd()
-    });
-    this.llamaProcess.stdout.setEncoding('utf8');
-    this.llamaProcess.stderr.setEncoding('utf8');
 
-    return new Promise((resolve, reject) => {
-        let modelLoaded = false;
-        let errorOutput = '';
-
-        this.llamaProcess.stderr.on('data', (data) => {
-            console.log('Model loading:', data);
-            if (data.includes('llama_model_load: loading') || data.includes('build: 5353')) {
-                modelLoaded = true;
-            }
-            errorOutput += data;
-        });
-        this.llamaProcess.stdout.on('data', (data) => {
-            if (modelLoaded) {
-                resolve();
-            }
-        });
-        setTimeout(() => {
-            if (!modelLoaded) {
-                this.llamaProcess.kill();
-                reject(new Error('Model loading timed out'));
-            }
-        }, 60000);
-        this.llamaProcess.once('close', (code) => {
-            if (code !== 0) {
-                reject(new Error(`Model process exited with code ${code}: ${errorOutput}`));
-            }
-        });
-    });
-}
     async generate(prompt) {
-    if (!this.llamaProcess) {
-        await this.loadModel();
-    }
-    return new Promise((resolve, reject) => {
-        let response = '';
-        let completed = false;
-        const responseTimeout = setTimeout(() => {
-            if (!completed) {
-                completed = true;
-                resolve("I apologize but I'm taking too long to respond. Please try again.");
-            }
-        }, 15000);
-        const onData = (data) => {
-            response += data;
-            if (!data) return;
-            
-            if (response.includes('\nUser:') || 
-                response.includes('Assistant:') || 
-                response.length > 100) {
-                clearTimeout(responseTimeout);
+        if (!this.llamaProcess) {
+            await this.loadModel();
+        }
+
+        return new Promise((resolve, reject) => {
+            let fullResponse = '';
+            let completed = false;
+            let buffer = '';
+
+            const responseTimeout = setTimeout(() => {
                 if (!completed) {
                     completed = true;
-                    let cleanResponse = response
-                        .split('\nUser:')[0]
-                        .split('Assistant:')
-                        .pop()
-                        .trim();
-                    resolve(cleanResponse || "I apologize but I couldn't generate a proper response.");
+                    resolve("I apologize, but I'm taking too long to respond. Please try again.");
                 }
+            }, 30000);
+
+            const onData = (data) => {
+                if (!data) return;
+                
+                buffer += data;
+                
+                if (/[.!?]/.test(buffer)) {
+                    fullResponse += buffer;
+                    buffer = '';
+                    
+                    if (fullResponse.includes('[/INST]')) {
+                        let cleanResponse = fullResponse
+                            .split('[/INST]')[1]
+                            .split('\n>')[0]
+                            .split('User:')[0]
+                            .trim();
+
+                        if (!cleanResponse.match(/[.!?]$/)) {
+                            cleanResponse += '.';
+                        }
+
+                        if (cleanResponse && !completed) {
+                            clearTimeout(responseTimeout);
+                            completed = true;
+                            resolve(cleanResponse);
+                        }
+                    }
+                }
+            };
+
+            this.llamaProcess.stdout.on('data', onData);
+            
+            try {
+                const systemPrompt = `You are Reka, a friendly AI assistant. Respond naturally in complete sentences.\nContext: Previous responses should inform your current response.\nUser: ${prompt}\nAssistant:`;
+                this.llamaProcess.stdin.write(systemPrompt + '\n');
+            } catch (err) {
+                console.error('Write error:', err);
+                reject(err);
             }
-        };
-        this.llamaProcess.stdout.on('data', onData);
-        this.llamaProcess.stderr.on('data', (data) => {
-            console.error('Model error:', data);
         });
-        try {
-            const formattedPrompt = `User: ${prompt}\nAssistant:`;
-            this.llamaProcess.stdin.write(formattedPrompt + '\n');
-        } catch (err) {
-            reject(err);
-        }
-    });
-}
+    }
+
     async close() {
         if (this.llamaProcess) {
             this.llamaProcess.kill();
