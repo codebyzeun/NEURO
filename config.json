@@ -12,7 +12,7 @@
     "repetition_penalty": 1.1,
     "maxContextLength": 2048,
     "usePromptTemplate": true,
-    "promptTemplate": "User: {prompt}\nAssistant:"
+    "promptTemplate": "[INST] You are Reka, a friendly AI assistant. Always respond in complete sentences and maintain a natural conversational tone. Question: {prompt} [/INST]"
   },
   "loggerOptions": {},
   "ttsOptions": {"enabled": false, "engine": "edge"},
