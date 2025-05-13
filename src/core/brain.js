@@ -43,11 +43,19 @@ class Brain {
         }
     }
     buildPrompt() {
-        return this.memory.map(entry => {
-            if (entry.role === 'user') return `User: ${entry.content}`;
-            if (entry.role === 'ai') return `AI: ${entry.content}`;
-            return `${entry.role}: ${entry.content}`;
-        }).join('\n') + '\nAI:';
+        const history = this.memory
+            .map(entry => {
+                if (entry.role === 'user') return `User: ${entry.content}`;
+                if (entry.role === 'ai') return `Assistant: ${entry.content}`;
+                return `${entry.role}: ${entry.content}`;
+            })
+            .join('\n');
+
+        return `[INST] You are Reka, a friendly AI assistant. Always respond in complete sentences.
+Previous conversation:
+${history}
+Current response should be natural and complete.
+[/INST]`;
     }
     async dispatchResponse(response, meta) {
         for (const dispatcher of this.dispatchers) {
