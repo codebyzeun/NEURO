@@ -1,10 +1,10 @@
 {
-  "twitchUsername": "suiren029",
-  "twitchToken": "oauth:gp762nuuoqcoxypju8c569th9wz7q5",
-  "twitchChannel": "suiren029",
-  "discordToken": "MTM2NDUxMDQ3NjIzNDY1Nzg0Mg.GU4c31.baqKcLg_48GwIq2lN0yL-6q8AOzsbEMVvnrGvc",
+  "twitchUsername": "",
+  "twitchToken": "oauth:",
+  "twitchChannel": "",
+  "discordToken": "",
   "obsWebSocketUrl": "ws://127.0.0.1:4455",
-  "obsPassword": "v0BWn7PUmBZQqBNU",
+  "obsPassword": "",
   "modelOptions": {
     "modelPath": "D:\\PERSONAL PROJECTS FOR GITHUB\\NEURO\\models\\mistral-7b-instruct-v0.2.Q4_K_M.gguf",
     "temperature": 0.7,
