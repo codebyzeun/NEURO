@@ -1,0 +1,28 @@
+{
+  "twitchUsername": "suiren029",
+  "twitchToken": "oauth:gp762nuuoqcoxypju8c569th9wz7q5",
+  "twitchChannel": "suiren029",
+  "discordToken": "MTM2NDUxMDQ3NjIzNDY1Nzg0Mg.GU4c31.baqKcLg_48GwIq2lN0yL-6q8AOzsbEMVvnrGvc",
+  "obsWebSocketUrl": "ws://127.0.0.1:4455",
+  "obsPassword": "v0BWn7PUmBZQqBNU",
+  "modelOptions": {
+    "modelPath": "D:\\PERSONAL PROJECTS FOR GITHUB\\NEURO\\models\\mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "repetition_penalty": 1.1,
+    "maxContextLength": 2048,
+    "usePromptTemplate": true,
+    "promptTemplate": "User: {prompt}\nAssistant:"
+  },
+  "loggerOptions": {},
+  "ttsOptions": {"enabled": false, "engine": "edge"},
+  "sttOptions": {},
+  "memoryOptions": {},
+  "tokenizerOptions": {},
+  "maxMemoryLength": 20,
+  "apiPort": 3000,
+  "useTwitch": false,
+  "useDiscord": true,
+  "useOBS": false,
+  "useTTS": false
+}
