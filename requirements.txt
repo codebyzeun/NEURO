@@ -1,0 +1,36 @@
+# Core AI engine
+node-llama-cpp     
+@xenova/transformers  
+child_process          
+
+# Speech Recognition (STT)
+mic                   
+whisper.cpp           
+
+# Text-to-Speech (TTS)
+edge-tts             
+play-sound          
+
+# Twitch & Discord Interfaces
+tmi.js                 
+discord.js             
+
+# OBS Control
+obs-websocket-js 
+
+# Utilities
+dotenv    
+winston               
+fs                    
+path                   
+readline              
+
+# Optional Memory/Storage
+better-sqlite
+
+# Dev Tools
+nodemon       
+
+# Optional:
+typescript
+@types/node
